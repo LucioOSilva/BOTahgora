@@ -27,5 +27,6 @@ async function logWriter(atribute, value) {
 }
 
 module.exports = {
+  logReader,
   logWriter,
 };
