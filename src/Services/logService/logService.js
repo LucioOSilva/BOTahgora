@@ -1,28 +1,28 @@
 const fs = require('fs/promises');
 
-async function logReader() {
+function logReader() {
   const filePath = 'src/logs/log.json';
   try {
-    const data = await fs.readFile(filePath, 'utf8');
-    const dataJsonParsed = JSON.parse(data);
-    return dataJsonParsed;
+    console.log("🟨 Log reading in progress...");
+    const data = fs.readFile(filePath, 'utf8').then(data => JSON.parse(data));
+    return data;
   } catch (err) {
-    console.log(`❌ Ocorreu um erro de log: ${err.message}`);
+    console.log(`❌ Something bad happened at log file: ${err.message}`);
   }
 }
 
-async function logWriter(atribute, value) {
+function logWriter(atribute, value) {
   const filePath = 'src/logs/log.json';
   
-  const fileUpdated = await logReader();
-  fileUpdated[atribute] = value;
-  const fileUpdatedString = JSON.stringify(fileUpdated, null, 2)
-  
   try {
-    await fs.writeFile(filePath, fileUpdatedString);
-    console.log("🟨 Log atualizado");
+    const fileUpdated = logReader();
+    fileUpdated[atribute] = value;
+    const fileUpdatedString = JSON.stringify(fileUpdated, null, 2)
+    fs.writeFile(filePath, fileUpdatedString).then(() => {
+      console.log("🟩 Log write saved success")
+    });
   } catch (err) {
-    console.log(`❌ Ocorreu um erro de log: ${err.message}`);
+    console.log(`❌ Something bad happened at log file: ${err.message}`);
   }
 }
 
