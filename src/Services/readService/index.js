@@ -1,7 +1,5 @@
-const { baseHourReader, cookieReader, dateReader } = require('./readService');
+const { dateReader } = require('./readService');
 
 module.exports = {
-  baseHourReader,
-  cookieReader,
   dateReader
 }

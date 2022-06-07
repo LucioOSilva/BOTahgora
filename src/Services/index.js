@@ -4,8 +4,7 @@ const {
   getStartUpAppDateBR,
   getStartUpAppHourComplete,
 } = require('./hourService');
-const { baseHourReader, cookieReader, dateReader } = require('./readService');
-const { logReader, logWriter } = require('./logService');
+const { dateReader } = require('./readService');
 
 
 module.exports = {
@@ -13,11 +12,5 @@ module.exports = {
   getStartUpAppTimeStamp,
   getStartUpAppDateBR,
   getStartUpAppHourComplete,
-
-  baseHourReader,
-  cookieReader,
   dateReader,
-
-  logReader,
-  logWriter,
 }
