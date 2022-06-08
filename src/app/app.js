@@ -108,6 +108,7 @@ const createListToPunch = (firstDayHourToPunchArray) => {
   for (let index = 0; index < sleepListItemsTotal; index += 1) {
     let lastTimeMS = timeSleepList[index]
     if (flag >= 4) {
+      flag = 4
       const timeSleep = hoursToMS((24 - finishWorkHour + startWorkHour))
       const timeToNextPunch = lastTimeMS + timeSleep + workStartEndVariation// aqui adicionar a variação de tempo
       timeSleepList.push(timeToNextPunch)
