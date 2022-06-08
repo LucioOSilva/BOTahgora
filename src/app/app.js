@@ -70,44 +70,46 @@ function retrieveFirstPunch () {
       return [4, finishWorkHourTimeStamp, timeUntilFirstPunch];
     }
     else {
-      console.log('✅ App iniciado com mais de um dia de espera, agendado para proximo dia!')
+      console.log('✅ App iniciado depois da hora do "fim da jornada"');
       const timeUntilFirstPunch = getTimeUntilfirstPunchInMS(finishWorkHourTimeStamp, startUpAppTimeStamp);
       console.log(`🟨 Tempo até a primeira batida: ${showHours(timeUntilFirstPunch)}`);
       return [5, finishWorkHourTimeStamp, timeUntilFirstPunch];
     }
   }
-  return [0, 'OPS... verifique as datas "deve conter a data atual e a data do proximo dia", app não inicializado!']
+  return [0, '🟥 ERRO - "deve conter a data atual e a data do proximo dia", app não inicializado!']
 }
 
 const createListToPunch = (firstDayHourToPunchArray) => {
+  if (firstDayHourToPunchArray[0] === 0) { return firstDayHourToPunchArray[1]}
+  const randomNumberMS = (min, max) => (Math.random() * (max - min) + min) * 60 * 1000;
+  
   const { dates } = dateReader();
   const { hourCompanyPreset, minutesVariation } = companyHours;
   const { startWorkHour, startLunchHour, finishLunchHour, finishWorkHour } = hourCompanyPreset;
   const hoursToMS = (hour) => hour * 60 * 60 * 1000
   const timeStampInitialStartApp = setStartUpAppTimeStamp();
-  const sleepListItemsTotal = (dates.length - 1) * 4 + firstDayHourToPunchArray[0]; // numero de vezes que preenchera a lista de pontos
-  const timeSleepList = [timeStampInitialStartApp.getTime() + (firstDayHourToPunchArray[2])] // inicia variavel array de items da lista de pontos
-
-  const randomNumberMS = (min, max) => (Math.random() * (max - min) + min) * 60 * 1000;
-
   
+  
+  let sleepListItemsTotal = null
+  const timeSleepList = []
+  if (firstDayHourToPunchArray[0] !== 5) {
+    sleepListItemsTotal = (dates.length - 1) * 4 + firstDayHourToPunchArray[0];
+    timeSleepList.push(...[timeStampInitialStartApp.getTime() + firstDayHourToPunchArray[2]]) // inicia variavel array de items da lista de pontos
+  } else {
+    sleepListItemsTotal = (dates.length - 1) * 4 + firstDayHourToPunchArray[0] - 1;
+    timeSleepList.push(...[timeStampInitialStartApp.getTime() + firstDayHourToPunchArray[2] - hoursToMS(24 - finishWorkHour + startWorkHour)]) // inicia variavel array de items da lista de pontos
+  }
+
+
   const workStartEndVariation = randomNumberMS(0, minutesVariation)
   const lunchStartEndVariation = randomNumberMS(-minutesVariation, minutesVariation)
-  if (firstDayHourToPunchArray[0] === 0) { return firstDayHourToPunchArray[1]}
+  const appWasStartedAfterFinishWorkHour = firstDayHourToPunchArray[0] === 5
   let flag = firstDayHourToPunchArray[0]
-  let triggerTimeVariation = firstDayHourToPunchArray[0] === 5 ? true : false
   for (let index = 0; index < sleepListItemsTotal; index += 1) {
-
     let lastTimeMS = timeSleepList[index]
-    if (flag === 5) {
-      const timeSleep = hoursToMS(startLunchHour - startWorkHour)
-      const timeToNextPunch = lastTimeMS + timeSleep // aqui adicionar a variação de tempo
-      timeSleepList.push(timeToNextPunch)
-    }
-    else if (flag === 4) {
+    if (flag >= 4) {
       const timeSleep = hoursToMS((24 - finishWorkHour + startWorkHour))
       const timeToNextPunch = lastTimeMS + timeSleep + workStartEndVariation// aqui adicionar a variação de tempo
-      if (triggerTimeVariation) timeToNextPunch 
       timeSleepList.push(timeToNextPunch)
     }
     else if (flag === 3) {
@@ -131,7 +133,8 @@ const createListToPunch = (firstDayHourToPunchArray) => {
     } 
     flag -= 1
   }
-  return timeSleepList
+  
+  return appWasStartedAfterFinishWorkHour ? timeSleepList.splice(1) : timeSleepList
 };
 
 const showPunchListDates = (punchList) => {
@@ -145,6 +148,7 @@ const showPunchListDates = (punchList) => {
 const calculateNextPunches = () => {
   console.log(`🟨 Calculando próximas batidas...`);
   const firstPunchArray = retrieveFirstPunch();  // [ 2, 2022-06-08T15:00:00.000Z, 5696058 ]
+  if (firstPunchArray[0] === 0) { return console.log(firstPunchArray[1])}
   console.log(`🟨 Criando lista das próximas batidas...`);
   const timeSleepList = createListToPunch(firstPunchArray);
   console.log(`🟨 Próximas batidas...`);
