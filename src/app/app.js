@@ -138,14 +138,6 @@ const createListToPunch = (firstDayHourToPunchArray) => {
   return appWasStartedAfterFinishWorkHour ? timeSleepList.splice(1) : timeSleepList
 };
 
-const showPunchListDates = (punchList) => {
-  punchList.map((punch) => {
-    const date = new Date(punch)
-    const showDateFormated = `${date.toLocaleDateString()}-${date.toLocaleTimeString()}`;
-    console.log(`➡  ${showDateFormated}`)
-  })
-}
-
 const calculateNextPunches = () => {
   console.log(`🟨 Calculando próximas batidas...`);
   const firstPunchArray = retrieveFirstPunch();  // [ 2, 2022-06-08T15:00:00.000Z, 5696058 ]
@@ -153,7 +145,6 @@ const calculateNextPunches = () => {
   console.log(`🟨 Criando lista das próximas batidas...`);
   const timeSleepList = createListToPunch(firstPunchArray);
   console.log(`🟨 Próximas batidas...`);
-  showPunchListDates(timeSleepList)
   return timeSleepList
 }
 
