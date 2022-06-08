@@ -154,9 +154,29 @@ const calculateNextPunches = () => {
   const timeSleepList = createListToPunch(firstPunchArray);
   console.log(`🟨 Próximas batidas...`);
   showPunchListDates(timeSleepList)
+  return timeSleepList
 }
 
-const startUpDate = () => {
+const startServiceToPunchTheClock = (punchList) => {
+  punchList.map((date, index) => {
+    const dateNowInstance = getStartUpAppTimeStamp();
+    const dateInstance = new Date(date);
+    const timeSleepInMS = new Date(dateInstance - dateNowInstance).setMilliseconds(0)
+    const dateinstanceText = `${dateInstance.toLocaleDateString('pt-BR')}-${dateInstance.toLocaleTimeString('pt-BR')}`
+    console.log(`AGENDAMENTO DE BATIDA DE PONTO EM: ${dateinstanceText} - FEITO!`)
+
+    setTimeout(() => {
+      console.log(`BATENDO PONTO EM: ${dateinstanceText}`)
+    }, timeSleepInMS);
+    if (index === (punchList.length - 1)) {
+      setTimeout(() => {
+        console.log(`TODOS OS PONTOS JÁ FORAM BATIDOS`)
+      }, timeSleepInMS);
+    }
+  })
+}
+
+const startAppUp = () => {
   console.log(`🟧 App de bater ponto "Ahgora" inicializando. . .`);
   setStartUpAppTimeStamp();
   const startDateFormated = `${getStartUpAppDateBR()}-${getStartUpAppHourComplete()}`;
@@ -164,9 +184,9 @@ const startUpDate = () => {
 };
 
 const startApp = () => {
-  startUpDate();
-  calculateNextPunches();
-  
+  startAppUp();
+  const listOfPunches = calculateNextPunches();
+  startServiceToPunchTheClock(listOfPunches)
 };
 
 startApp();
